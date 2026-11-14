@@ -1,0 +1,128 @@
+{
+  "editsVersion": "455.0.0",
+  "editsBuild": "1109393326",
+  "bundleId": "com.burbn.basel.mac",
+  "schema": "2026.10.19-1",
+  "probed": "2026-11-10",
+  "connection": {
+    "mcpServer": "metapilot-native",
+    "transport": "direct HTTP http://127.0.0.1:19501/mcp (no insta-edits bridge)",
+    "toolRefresh": "works: Claude Code picked up the editor tool list after newProject/openProject and the home list after closeProject",
+    "toolCounts": {"home": 41, "editor": 285},
+    "tokenStorage": "plaintext Authorization header in ~/.claude.json (adapter recommends keychain via the bridge)"
+  },
+  "canvas": {"width": 1440, "height": 2560, "aspect": "9:16", "fps": 60, "note": "new-project defaults"},
+  "coords": {
+    "origin": "top-left",
+    "range": [0, 1],
+    "yDown": true,
+    "textAnchor": "center",
+    "elementAnchor": "center",
+    "readBack": "getTransform (getElement.textPosition is stale, always [0,0])"
+  },
+  "time": {
+    "unit": "seconds",
+    "fps": 60,
+    "snaps": true,
+    "snapNote": "move to 0.0123 s landed on 0.016667 (1/60); caption times re-snap to the 60 fps grid on reload"
+  },
+  "stableIds": "element.id",
+  "stableIdsNote": "UUIDs persist across saveProject/closeProject/openProject. No name/label/metadata field on elements. Reconcile must keep an EDL-id -> UUID map in the project folder. splitCaption (and presumably split/splitClip) replaces the element with new UUIDs.",
+  "captions": {
+    "timings": "segment",
+    "timingsNote": "captions() returns phrase start/end plus tokens without per-word times; Edits holds word times internally (splitCaption at 6.0 snapped to the word gap 6.26/6.32)",
+    "editable": true,
+    "editNote": "editCaption rewrites a phrase in place; tokens keep originalText and record editedText",
+    "generateSources": ["video", "voiceover", "importedAudio", "all"],
+    "languageTested": "pt"
+  },
+  "segmentation": {
+    "tool": "addStickerFromCutout",
+    "result": "masked overlay of the clip on a new top track",
+    "maskIsVideo": false,
+    "verdict": "unusable for behind-head: the mask is a single still frame; correct on the first frame, wrong once the head moves"
+  },
+  "behindHead": "alpha-layer",
+  "alphaCodecs": ["prores", "hevc"],
+  "alphaNote": "Both imported with addOverlay, composited over the base and over a text placed between; transparent area showed base and text, opaque area hid the text, in captureFrame and in the export.",
+  "overlayFillsLikeBase": true,
+  "overlayNote": "A 1080x1920 file on an overlay track at scale 1 fills the canvas exactly like the base clip. Same setTransform (scale 1.6, x 0.55, y 0.6) on base and overlay = identical framing, no double edge (checked at 50% opacity, both for a duplicate and for a separately imported file, preview and export).",
+  "stacking": {
+    "order": "tracks() lists bottom to top; main track is index 0",
+    "newTrackDefault": "addOverlay and addStickerFromCutout create a new track on top",
+    "traps": [
+      "duplicate(placement=newTrackSameTime) inserts its track directly above the main track, below existing texts",
+      "addText reuses any overlay track with free time (the probe text landed on the captions track); use moveToLayer to fix order"
+    ]
+  },
+  "export": {
+    "codec": "hevc",
+    "pixFmt": "yuvj420p",
+    "resolution": "1440x2560",
+    "fps": 60,
+    "audio": "aac 44.1 kHz stereo, present",
+    "async": "export returns at once; poll exportStatus (state exporting -> complete); 12 s timeline took ~30 s",
+    "sandboxPathTested": "~/Movies/reel-edits/<project>/renders/"
+  },
+  "tools": {
+    "project.list": "projects",
+    "project.create": "newProject",
+    "project.open": "openProject",
+    "project.close": "closeProject",
+    "project.save": "saveProject",
+    "project.rename": "setTitle",
+    "project.delete": "deleteProject",
+    "app.state": "appState",
+    "rules": "getCapabilities",
+    "media.import": "importMedia",
+    "media.importAudio": "addMedia (audioKind: music | soundEffect | voiceover)",
+    "media.status": "mediaStatus",
+    "timeline.read": ["tracks", "clips", "elements", "getElement", "state", "getCanvas"],
+    "clip.trim": ["trimClip", "trimStart", "trimEnd", "trim", "slipClip"],
+    "clip.split": ["splitClip", "splitAt", "split"],
+    "clip.move": ["move", "reorderClip", "moveToLayer"],
+    "clip.remove": ["selectById", "delete"],
+    "clip.duplicate": "duplicate",
+    "clip.transform": ["setTransform", "setTransforms", "getTransform", "setTransformKeyframes", "setTransformKeyframe", "getTransformKeyframes"],
+    "clip.crop": ["setCrop", "cropClip", "clearCrop"],
+    "clip.opacity": "setOpacity",
+    "overlay": ["addOverlay", "convertToOverlay", "convertToMain"],
+    "speed": ["setSpeed", "setSpeedCurve"],
+    "transition": ["addTransition", "listTransitionsCatalog", "transitions"],
+    "color": ["applyFilter", "applyLUT", "setColorGrade", "applyAdjust", "setHSL", "setColorWheel", "setCurve", "addAdjustmentLayer"],
+    "text.add": "addText",
+    "text.edit": "editText",
+    "text.position": "setTextPosition",
+    "text.style": ["setTextStyle", "setTextFont", "applyTextPreset", "setEmphasis"],
+    "text.animate": "setTextAnimation",
+    "captions.generate": "generateCaptions",
+    "captions.read": "captions",
+    "captions.edit": ["editCaption", "splitCaption", "mergeCaptions", "deleteCaptions"],
+    "captions.style": ["setCaptionStyle", "setCaptionHighlights", "setCaptionHighlightColor"],
+    "audio.sfx": ["addSoundEffect", "searchSoundEffects", "listSoundEffects", "deleteSoundEffect"],
+    "audio.volume": ["setVolume", "setFade", "setDucking", "muteTrack", "unmuteTrack", "getVolume"],
+    "audio.analysis": ["loudness", "audioLevels", "findPauses", "quietPoint", "sampleOutputLevel"],
+    "effects": ["applyEffect", "setMask"],
+    "segmentation": "addStickerFromCutout (still-frame mask only)",
+    "preview.frame": ["captureFrame", "previewVideo", "previewVideoStatus", "previewVideoFrames", "frameSheet"],
+    "export": ["export", "exportStatus", "setExportSettings", "cancelExport"],
+    "wait": "wait"
+  },
+  "paramTraps": [
+    "addOverlay: scale must be in (0, 1]; set larger zoom afterwards with setTransform",
+    "setTransform: keyframes is required and must be reject | offsetAll | clear; allowBeyondCanvas is required",
+    "addMedia is audio only; use importMedia for video",
+    "generateCaptions source must be video | voiceover | importedAudio | all",
+    "setTransforms takes items as a JSON string"
+  ],
+  "forbidden": [],
+  "forbiddenNote": "No share/publish/schedule/upload tool is exposed in this build. Any tool with that purpose that appears later is forbidden without explicit per-video approval.",
+  "avoid": ["addSongToComposition", "addMusicTrack", "addLibraryMedia (music)"],
+  "gaps": [
+    "No name/metadata field on elements: reconcile needs an EDL-id -> UUID map file",
+    "Caption word timings are not exposed, only phrase start/end",
+    "Native segmentation is a still-frame mask; behind-head needs matte.py alpha layers",
+    "Text box width is fixed: long words at large sizes wrap onto two lines (seen at size 90)",
+    "HEVC alpha cannot be checked with ffprobe here (alpha shows as None); Edits composites it correctly"
+  ]
+}

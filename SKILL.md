@@ -25,7 +25,8 @@ JSON, text or a JPG to look at.
 
 Read before building: `references/edits-adapter.md` (talking to Edits: bridge, discovery, layer stacking,
 reconcile, traps), `references/layout.md` (safe zone and behind-head maths in Edits' normalised canvas),
-`references/looks.md` (the three looks as design intent, mapped to what Edits offers), `references/gotchas.md`.
+`references/looks.md` (the three looks as design intent, mapped to what Edits offers), `references/styles.md` (every
+style the skill can make, with ready/build status), `references/gotchas.md`.
 Read `references/overlays.md` only when the script calls for an animated insert.
 
 macOS on Apple silicon only: Edits desktop exists nowhere else.
@@ -87,6 +88,14 @@ missing, re-run discovery before editing.
   path, under `~/Movies`).
 - Style references (reels, pins): look at their frames before designing anything (overlays.md says how to fetch).
 
+### 1b. Style choice (when the request does not name the style)
+Read `references/styles.md`. If the request does not clearly say which style to use (no look named, a vague
+"make it look good", or an effect that fits several styles), do not guess. Reply with 3 or 4 candidate styles, each
+one line: the style name, what it looks like on screen, and whether it is **ready** or **build** (new work). Pick
+the candidates from the script's tone and the references, and always include the user's default look. Then wait for
+the user's pick before building the EDL. A clear request (a named look, or a reference reel with a style the user
+asked to copy) skips this step: say in one line which style was used.
+
 ### 2. Ingest and stage
 ```bash
 PY SK/scripts/ingest.py <project> <clips or folder> [--newest 5]
@@ -129,6 +138,11 @@ not the first:
    possible with this Edits build.
 Place behind-head words with `layers.json` -> `head.canvas_head_top` and the formula in layout.md. `head.moving`
 true means the head moves during the segment: put that word in front instead.
+
+Reel styles (paper cut, sticker, scribble, headline, character wall, camera frame): deterministic, no sub-agent.
+`PY SK/scripts/reelstyles.py <project>/media/styles/<name>.mov --style <id> --text "<words>" --dur <s> [--x --y --rot]`
+writes a full-canvas alpha overlay, placed at the EDL's `at` like any insert. Catalog and status in
+`references/styles.md`. Check a still first with `--preview-t <s>`. Put `parede-caracteres` on `layer: behind`.
 
 Animated inserts: one sub-agent per insert with the brief in overlays.md (transparent WebM), then
 `PY SK/scripts/alphamov.py <in.webm> <project>/media/inserts/<name>.mov --codec <codec>`. Keep building meanwhile.
